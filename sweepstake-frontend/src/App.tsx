@@ -10,7 +10,7 @@ import assignedTeams from './assets/assigned_teams.json';
 import type { GroupTeam } from './Classes/GroupTeam';
 
 const colours = ["#bf2932", "#589043", "#23658e"];
-const zoneTimes = {
+const zoneTimes: Record<string, number> = {
   "1": 7,
   "2": 7,
   "3": 7,
@@ -157,6 +157,13 @@ function App() {
     }
   }
 
+  function getAssignedTeamName(fifaCode?: string): string {
+    if (!fifaCode) {
+      return '';
+    }
+    return assignedTeams[fifaCode as keyof typeof assignedTeams] ?? '';
+  }
+
   function shortenTeamName(name: string | undefined): string {
     if (name) {
       if (name.includes('Congo')) {
@@ -181,11 +188,11 @@ function App() {
         {currentGame && <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
           <Box sx={{ width: '100%' }}>The Current Game Is:</Box>
           <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
-            <Grid size={4}>{currentGame.home_team_name_en} ({assignedTeams[teams.find((team) => team.name_en == currentGame.home_team_name_en)?.fifa_code]})</Grid>
+            <Grid size={4}>{currentGame.home_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.home_team_name_en)?.fifa_code)})</Grid>
             <Grid size={1}>{currentGame.home_score}</Grid>
             <Grid size={2}>vs</Grid>
             <Grid size={1}>{currentGame.away_score}</Grid>
-            <Grid size={4}>{currentGame.away_team_name_en} ({assignedTeams[teams.find((team) => team.name_en == currentGame.away_team_name_en)?.fifa_code]})</Grid>
+            <Grid size={4}>{currentGame.away_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.away_team_name_en)?.fifa_code)})</Grid>
           </Grid>
           <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
             <Grid size={4}>{currentGame.home_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(',')}</Grid>
@@ -198,8 +205,8 @@ function App() {
         {nextGame &&
           <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
             <Box sx={{ width: '100%' }}>The Next Game Is:</Box>
-            <Box sx={{ width: '100%' }}>{nextGame?.home_team_name_en} ({assignedTeams[teams.find((team) => team.name_en == nextGame?.home_team_name_en)?.fifa_code]}) vs {nextGame?.away_team_name_en} ({assignedTeams[teams.find((team) => team.name_en == nextGame?.away_team_name_en)?.fifa_code]})</Box>
-            <Box sx={{ width: '100%' }}>{new Date(nextGame?.date).toLocaleString()}</Box>
+            <Box sx={{ width: '100%' }}>{nextGame?.home_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == nextGame?.home_team_name_en)?.fifa_code)}) vs {nextGame?.away_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == nextGame?.away_team_name_en)?.fifa_code)})</Box>
+            <Box sx={{ width: '100%' }}>{nextGame.date ? new Date(nextGame.date).toLocaleString() : ''}</Box>
           </Grid>
         }
         <Grid container spacing={2}>
@@ -223,7 +230,7 @@ function App() {
                         <Grid size={8} style={{ border: '1px solid white' }} sx={{ fontSize: 'default' }}>
                           <Grid container sx={{ height: '100%' }}>
                             <Grid size={1} sx={{ height: '100%' }}><Box component='img' src={currentTeam.flag} sx={{ height: '2rem', width: '3rem' }} /></Grid>
-                            <Grid size={11} sx={{ alignContent: 'center' }}>{shortenTeamName(getTeamById(team.team_id)?.name_en)} ({assignedTeams[currentTeam.fifa_code]})</Grid>
+                            <Grid size={11} sx={{ alignContent: 'center' }}>{shortenTeamName(getTeamById(team.team_id)?.name_en)} ({getAssignedTeamName(currentTeam.fifa_code)})</Grid>
                           </Grid>
                         </Grid>
                         <Grid size={2} style={{ border: '1px solid white' }} sx={{ fontSize: 'default', alignContent: 'center' }}>{team.pts}</Grid>
@@ -246,10 +253,10 @@ function App() {
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
                             }}>
-                              {shortenTeamName(getTeamById(game.home_team_id)?.name_en)} ({assignedTeams[getTeamById(game.home_team_id)?.fifa_code]}) vs {shortenTeamName(getTeamById(game.away_team_id)?.name_en)} ({assignedTeams[getTeamById(game.away_team_id)?.fifa_code]})</Grid>
+                              {shortenTeamName(getTeamById(game.home_team_id)?.name_en)} ({getAssignedTeamName(getTeamById(game.home_team_id)?.fifa_code)}) vs {shortenTeamName(getTeamById(game.away_team_id)?.name_en)} ({getAssignedTeamName(getTeamById(game.away_team_id)?.fifa_code)})</Grid>
                           </Grid>
                           <Grid container>
-                            <Grid size={8}> <Box sx={{ fontSize: 'small', fontStyle: 'italic', color: '#23658e', textAlign: 'left' }}>{new Date(game.date).toLocaleString()}</Box></Grid>
+                            <Grid size={8}> <Box sx={{ fontSize: 'small', fontStyle: 'italic', color: '#23658e', textAlign: 'left' }}>{game.date ? new Date(game.date).toLocaleString() : ''}</Box></Grid>
                             <Grid size={2} sx={{ borderLeft: '1px solid #589043', borderRight: '1px solid #589043' }}>{game.home_score}</Grid>
                             <Grid size={2} sx={{ borderLeft: '1px solid #589043', borderRight: '1px solid #589043' }}>{game.away_score}</Grid>
                           </Grid>
