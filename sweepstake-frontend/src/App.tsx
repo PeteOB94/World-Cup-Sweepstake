@@ -185,9 +185,9 @@ function App() {
   return (
     <>
       <Stack spacing={3}>
-        {currentGame && <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
+        {currentGame && <Grid container sx={{ backgroundColor: 'white', color: 'black', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
           <Box sx={{ width: '100%' }}>The Current Game Is:</Box>
-          <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
+          <Grid container sx={{ backgroundColor: 'white', color: 'black' }} size={6}>
             <Grid size={4}>{currentGame.home_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.home_team_name_en)?.fifa_code)})</Grid>
             <Grid size={1}>{currentGame.home_score}</Grid>
             <Grid size={2}>vs</Grid>
@@ -195,11 +195,11 @@ function App() {
             <Grid size={4}>{currentGame.away_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.away_team_name_en)?.fifa_code)})</Grid>
           </Grid>
           <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
-            <Grid size={4}>{currentGame.home_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(',')}</Grid>
+            <Grid size={4}>{currentGame.home_scorers != "null" ? currentGame.home_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(',') : ''}</Grid>
             <Grid size={1}></Grid>
             <Grid size={2}></Grid>
             <Grid size={1}></Grid>
-            <Grid size={4}>{currentGame.away_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(',')}</Grid>
+            <Grid size={4}>{currentGame.away_scorers != "null" ? currentGame.away_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(',') : ''}</Grid>
           </Grid>
         </Grid>}
         {nextGame &&
