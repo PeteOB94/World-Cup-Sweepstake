@@ -191,25 +191,25 @@ function App() {
             <Grid container>
               <Grid size={3}><></></Grid>
               <Grid container sx={{ backgroundColor: 'white', color: 'black' }} size={6}>
-                <Grid size={4} sx={{ textAlign: 'right' }}>{currentGame.home_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.home_team_name_en)?.fifa_code)})</Grid>
+                <Grid size={{ xs: 2, md: 4 }} sx={{ textAlign: 'right' }}>{currentGame.home_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.home_team_name_en)?.fifa_code)})</Grid>
                 <Grid size={1} sx={{ textAlign: 'right' }}>{currentGame.home_score}</Grid>
                 <Grid size={2}>vs</Grid>
                 <Grid size={1} sx={{ textAlign: 'left' }}>{currentGame.away_score}</Grid>
-                <Grid size={4} sx={{ textAlign: 'left' }}>{currentGame.away_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.away_team_name_en)?.fifa_code)})</Grid>
+                <Grid size={{ xs: 2, md: 4 }} sx={{ textAlign: 'left' }}>{currentGame.away_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.away_team_name_en)?.fifa_code)})</Grid>
               </Grid>
               <Grid size={3}><></></Grid>
             </Grid>
             <Grid container>
               <Grid size={3}><></></Grid>
               <Grid container sx={{ backgroundColor: 'white', color: 'black', fontSize: 'default', fontStyle: 'italic', color: '#23658e' }} size={6}>
-                <Grid size={4} sx={{ textAlign: 'right' }}>
+                <Grid size={{ xs: 2, md: 4 }} sx={{ textAlign: 'right' }}>
                   {currentGame.home_scorers != "null" ? currentGame.home_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(', ') : ''}
                 </Grid>
                 <Grid size={1}></Grid>
                 <Grid size={2}></Grid>
                 <Grid size={1}></Grid>
-                <Grid size={4} sx={{ textAlign: 'left' }}>
-                  {currentGame.away_scorers != "null" ? currentGame.away_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(',') : ''}
+                <Grid size={{ xs: 2, md: 4 }} sx={{ textAlign: 'left' }}>
+                  {currentGame.away_scorers != "null" ? currentGame.away_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(', ') : ''}
                 </Grid>
                 <Grid size={3}><></></Grid>
               </Grid>
