@@ -9,4 +9,5 @@ export class GroupTeam {
     pts!: string;
     team_id!: string;
     w!: string;
+    id?: string;
 }

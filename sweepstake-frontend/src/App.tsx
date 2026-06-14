@@ -1,33 +1,18 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import './App.css'
-import type { Game } from './Classes/Game';
-import { Group } from './Classes/Group';
-import type { Team } from './Classes/Team';
-import type { Stadium } from './Classes/Stadium';
-import { Box, Grid, Stack } from '@mui/material';
-import assignedTeams from './assets/assigned_teams.json';
-import type { GroupTeam } from './Classes/GroupTeam';
-
-const colours = ["#bf2932", "#589043", "#23658e"];
-const zoneTimes: Record<string, number> = {
-  "1": 7,
-  "2": 7,
-  "3": 7,
-  "4": 6,
-  "5": 6,
-  "6": 6,
-  "7": 5,
-  "8": 5,
-  "9": 5,
-  "10": 5,
-  "11": 5,
-  "12": 5,
-  "13": 8,
-  "14": 8,
-  "15": 8,
-  "16": 8
-}
+import type { Game } from './classes/Game';
+import { Group } from './classes/Group';
+import type { Team } from './classes/Team';
+import type { Stadium } from './classes/Stadium';
+import { BottomNavigation, BottomNavigationAction, Box, Paper, Stack } from '@mui/material';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import SportsOutlinedIcon from '@mui/icons-material/SportsOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import type { GroupTeam } from './classes/GroupTeam';
+import GroupsPage from './pages/GroupsPage';
+import HomePage from './pages/HomePage';
+import MatchesPage from './pages/MatchesPage';
+import { ZoneTimes } from './assets/ZoneTimes';
 
 function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -36,12 +21,18 @@ function App() {
   const [stadiums, setStadiums] = useState<Stadium[]>([]);
   const [nextGame, setNextGame] = useState<Game>();
   const [currentGame, setCurrentGame] = useState<Game>();
+  const [value, setValue] = useState(0);
+  const [groupNames, setGroupNames] = useState<string[]>([]);
+  const rounds: string[] = [];
 
   useEffect(() => {
     async function getGroupsData() {
       await axios.get('https://worldcup26.ir/get/groups').then((response) => {
         const sortedGroups = response.data.groups.sort((a: Group, b: Group) => (a.name && b.name) ? ((a.name > b.name) ? 1 : (a.name < b.name) ? -1 : 0) : 0);
         sortedGroups.forEach((group: Group) => {
+          const currentGroupNames = groupNames;
+          currentGroupNames.push(group.name);
+          setGroupNames(currentGroupNames);
           group.teams.sort((a: GroupTeam, b: GroupTeam) => {
             const aPts = parseInt(a.pts);
             const bPts = parseInt(b.pts);
@@ -73,6 +64,7 @@ function App() {
             }
             return 0;
           });
+          group.teams.forEach((team: GroupTeam) => team.id = team._id);
         });
         setGroups(sortedGroups);
       })
@@ -107,11 +99,12 @@ function App() {
     async function getGameData() {
       await axios.get('https://worldcup26.ir/get/games').then((response) => {
         response.data.games.forEach((game: Game) => {
+          rounds.push(game.type);
           const gameTime = Date.parse(game.local_date);
           const stadium = stadiums.find((stadium) => stadium.id == game.stadium_id);
           let difference = 0;
           if (stadium) {
-            difference = zoneTimes[stadium.id];
+            difference = ZoneTimes[stadium.id];
           }
           const gameTimeLocal = gameTime + (difference * 60 * 60 * 1000);
           game.date = gameTimeLocal;
@@ -119,6 +112,7 @@ function App() {
             setCurrentGame(game);
           }
         })
+        response.data.games.sort((a: Game, b: Game) => (a.date && b.date) ? ((a.date > b.date) ? 1 : (a.date < b.date) ? -1 : 0) : 0);
         setNextGame(response.data.games[0])
         setGames(response.data.games);
       });
@@ -148,143 +142,27 @@ function App() {
     }
   }, [games])
 
-  function getTeamById(id: string): Team | undefined {
-    if (id) {
-      return teams.find((team) => team.id == id);
-    }
-    else {
-      return undefined;
-    }
-  }
-
-  function getAssignedTeamName(fifaCode?: string): string {
-    if (!fifaCode) {
-      return '';
-    }
-    return assignedTeams[fifaCode as keyof typeof assignedTeams] ?? '';
-  }
-
-  function shortenTeamName(name: string | undefined): string {
-    if (name) {
-      if (name.includes('Congo')) {
-        return 'DR Congo';
-      }
-      if (name.includes('Bosnia')) {
-        return 'Bosnia & Herzegovina';
-      }
-      return name;
-    }
-    else {
-      return '';
-    }
-    return '';
-  }
-
-  let coloursIndex = 0;
-
   return (
-    <>
-      <Stack spacing={3}>
-        {currentGame && <Grid container sx={{ backgroundColor: 'white', color: 'black', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-          <Stack spacing={1} sx={{ width: '100%' }}>
-            <Box sx={{ width: '100%' }}>The Current Game Is:</Box>
-            <Grid container>
-              <Grid size={{ xs: 0, md: 3 }}><></></Grid>
-              <Grid container sx={{ backgroundColor: 'white', color: 'black' }} size={{ xs: 12, md: 6 }}>
-                <Grid size={{ xs: 4, md: 4 }} sx={{ textAlign: 'center' }}>{currentGame.home_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.home_team_name_en)?.fifa_code)})</Grid>
-                <Grid size={{ xs: 1, md: 1 }} sx={{ textAlign: 'center'}}>{currentGame.home_score}</Grid>
-                <Grid size={{ xs: 2, md: 2 }} sx={{ textAlign: 'center' }}>vs</Grid>
-                <Grid size={{ xs: 1, md: 1 }} sx={{ textAlign: 'center' }}>{currentGame.away_score}</Grid>
-                <Grid size={{ xs: 4, md: 4 }} sx={{ textAlign: 'center' }}>{currentGame.away_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == currentGame.away_team_name_en)?.fifa_code)})</Grid>
-              </Grid>
-              <Grid size={{ xs: 0, md: 3 }}><></></Grid>
-            </Grid>
-            <Grid container>
-              <Grid size={{ xs: 0, md: 3 }}><></></Grid>
-              <Grid container sx={{ backgroundColor: 'white', color: 'black', fontSize: 'default', fontStyle: 'italic', color: '#23658e' }} size={{ xs: 12, md: 6 }}>
-                <Grid size={{ xs: 4, md: 4 }} sx={{ textAlign: 'center' }}>
-                  {currentGame.home_scorers != "null" ? currentGame.home_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(', ') : ''}
-                </Grid>
-                <Grid size={{ xs: 1, md: 1 }}></Grid>
-                <Grid size={{ xs: 2, md: 2 }}></Grid>
-                <Grid size={{ xs: 1, md: 1 }}></Grid>
-                <Grid size={{ xs: 4, md: 4 }} sx={{ textAlign: 'center' }}>
-                  {currentGame.away_scorers != "null" ? currentGame.away_scorers?.replaceAll("”", "").replaceAll("“", "").replaceAll("{", "").replaceAll("}", "").split(', ') : ''}
-                </Grid>
-                <Grid size={{ xs: 0, md: 3 }}><></></Grid>
-              </Grid>
-            </Grid>
-          </Stack>
-        </Grid>}
-        {nextGame &&
-          <Grid container sx={{ backgroundColor: 'white', color: 'black' }}>
-            <Box sx={{ width: '100%' }}>The Next Game Is:</Box>
-            <Box sx={{ width: '100%' }}>{nextGame?.home_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == nextGame?.home_team_name_en)?.fifa_code)}) vs {nextGame?.away_team_name_en} ({getAssignedTeamName(teams.find((team) => team.name_en == nextGame?.away_team_name_en)?.fifa_code)})</Box>
-            <Box sx={{ width: '100%' }}>{nextGame.date ? new Date(nextGame.date).toLocaleString() : ''}</Box>
-          </Grid>
-        }
-        <Grid container spacing={2}>
-          {groups.map(group => {
-            coloursIndex = (coloursIndex + 1) % 3;
-            return (
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Box style={{ border: '1px solid white' }} sx={{ fontWeight: 'heavy', backgroundColor: `${colours[coloursIndex]}`, color: 'black' }}>
-                  Group {group.name}
-                </Box>
-                <Grid container>
-                  <Grid size={8} style={{ border: '1px solid white' }} sx={{ fontSize: 'default' }}></Grid>
-                  <Grid size={2} style={{ border: '1px solid white' }} sx={{ fontSize: 'default' }}>PTS</Grid>
-                  <Grid size={2} style={{ border: '1px solid white' }} sx={{ fontSize: 'default' }}>GD</Grid>
-                </Grid>
-                <Stack spacing={0}>
-                  {group.teams?.map(team => {
-                    const currentTeam = getTeamById(team.team_id);
-                    if (currentTeam != undefined && currentTeam.fifa_code != undefined) {
-                      return (<Grid container sx={{ height: '100%' }}>
-                        <Grid size={8} style={{ border: '1px solid white' }} sx={{ fontSize: 'default' }}>
-                          <Grid container sx={{ height: '100%' }}>
-                            <Grid size={1} sx={{ height: '100%' }}><Box component='img' src={currentTeam.flag} sx={{ height: '2rem', width: '3rem' }} /></Grid>
-                            <Grid size={11} sx={{ alignContent: 'center' }}>{shortenTeamName(getTeamById(team.team_id)?.name_en)} ({getAssignedTeamName(currentTeam.fifa_code)})</Grid>
-                          </Grid>
-                        </Grid>
-                        <Grid size={2} style={{ border: '1px solid white' }} sx={{ fontSize: 'default', alignContent: 'center' }}>{team.pts}</Grid>
-                        <Grid size={2} style={{ border: '1px solid white' }} sx={{ fontSize: 'default', alignContent: 'center' }}>{team.gd}</Grid>
-                      </Grid>)
-                    }
-                  })}
-                </Stack>
-                <Stack spacing={0} sx={{ marginTop: '0.5rem' }}>
-                  {games.map((game: Game) => {
-                    if (game.group == group.name) {
-                      return (
-                        <Stack spacing={0}>
-                          <Grid container sx={{ fontSize: 'small', height: '100%', border: '1px solid white' }}>
-                            <Grid size={12} sx={{
-                              marginLeft: '0.5rem',
-                              display: 'inline',
-                              textAlign: 'left',
-                              overflow: 'auto',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {shortenTeamName(getTeamById(game.home_team_id)?.name_en)} ({getAssignedTeamName(getTeamById(game.home_team_id)?.fifa_code)}) vs {shortenTeamName(getTeamById(game.away_team_id)?.name_en)} ({getAssignedTeamName(getTeamById(game.away_team_id)?.fifa_code)})</Grid>
-                          </Grid>
-                          <Grid container>
-                            <Grid size={8}> <Box sx={{ fontSize: 'small', fontStyle: 'italic', color: '#23658e', textAlign: 'left' }}>{game.date ? new Date(game.date).toLocaleString() : ''}</Box></Grid>
-                            <Grid size={2} sx={{ borderLeft: '1px solid #589043', borderRight: '1px solid #589043' }}>{game.home_score}</Grid>
-                            <Grid size={2} sx={{ borderLeft: '1px solid #589043', borderRight: '1px solid #589043' }}>{game.away_score}</Grid>
-                          </Grid>
-                        </Stack>
-                      );
-                    }
-                  })}
-                </Stack>
-              </Grid>
-            )
-          })}
-        </Grid>
-      </Stack>
-    </>
+    <Stack>
+      {value == 0 && <HomePage currentGame={currentGame} nextGame={nextGame} teams={teams} stadiums={stadiums} />}
+      {value == 1 && <GroupsPage groups={groups} teams={teams} />}
+      {value == 2 && <MatchesPage matches={games} teams={teams} stadiums={stadiums} groups={groupNames} rounds={rounds} />}
+      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
+        <Box sx={{ width: 1 }}>
+          <BottomNavigation
+            showLabels
+            value={value}
+            onChange={(event, newValue) => {
+              setValue(newValue);
+            }}
+          >
+            <BottomNavigationAction label="Home" icon={<HomeOutlinedIcon />} />
+            <BottomNavigationAction label="Groups" icon={<GroupsOutlinedIcon />} />
+            <BottomNavigationAction label="Matches" icon={<SportsOutlinedIcon />} />
+          </BottomNavigation>
+        </Box>
+      </Paper>
+    </Stack>
   )
 }
 
