@@ -13,6 +13,7 @@ import GroupsPage from './pages/GroupsPage';
 import HomePage from './pages/HomePage';
 import MatchesPage from './pages/MatchesPage';
 import { ZoneTimes } from './assets/ZoneTimes';
+import axiosRetry from 'axios-retry';
 
 function App() {
   const [games, setGames] = useState<Game[]>([]);
@@ -24,6 +25,16 @@ function App() {
   const [value, setValue] = useState(0);
   const [groupNames, setGroupNames] = useState<string[]>([]);
   const rounds: string[] = [];
+
+  axiosRetry(axios, {
+    retries: 5,
+    retryDelay: (retryCount) => {
+        return retryCount * 2000;
+    },
+    retryCondition: (error) => {
+        return error ? true : false;
+    },
+});
 
   useEffect(() => {
     async function getGroupsData() {

@@ -1,7 +1,28 @@
 import { Box, Card, CardContent, Chip, Divider, Grid, Stack, Typography } from "@mui/material";
 import type { Game } from "../classes/Game";
 
-function GameCard({ game, homeTeamName, homeTeamFlag, homeTeamAssignee, awayTeamName, awayTeamFlag, awayTeamAssignee, stadiumName }: { game: Game; homeTeamName: string; homeTeamFlag: string; homeTeamAssignee: string; awayTeamName: string; awayTeamFlag: string; awayTeamAssignee: string; stadiumName: string }) {
+function GameCard({
+    game, 
+    homeTeamName, 
+    homeTeamFlag, 
+    homeTeamAssignee, 
+    awayTeamName, 
+    awayTeamFlag, 
+    awayTeamAssignee, 
+    stadiumName, 
+    homeTeamScorers, 
+    awayTeamScorers }: { 
+        game: Game; 
+        homeTeamName: string; 
+        homeTeamFlag: string; 
+        homeTeamAssignee: string; 
+        awayTeamName: string; 
+        awayTeamFlag: string; 
+        awayTeamAssignee: string; 
+        stadiumName: string;
+        homeTeamScorers: string[];
+        awayTeamScorers: string[];
+     }) {
 
     return (
         <Box>
@@ -52,6 +73,26 @@ function GameCard({ game, homeTeamName, homeTeamFlag, homeTeamAssignee, awayTeam
                                 </Grid>
                             </Grid>
                             <Grid size={4}></Grid>
+                        </Grid>
+                        <Divider sx={{ paddingBottom: 2 }} />
+                        <Grid container spacing={2}>
+                            <Grid size={5} sx={{ textAlign: 'center' }}>
+                                {homeTeamScorers.map((scorer: string) => {
+                                    if(scorer.replace(/[^\p{L}\d .']/gu, '') != 'null') {
+                                        return <Typography sx={{ fontSize: '0.75rem'}}><i>{scorer.replace(/[^\p{L}\d .']/gu, '')}</i></Typography>
+                                    }
+                                })}
+                            </Grid>
+                            <Grid size={2} sx={{ textAlign: 'center' }}>
+                                <Typography variant="body2"></Typography>
+                            </Grid>
+                            <Grid size={5} sx={{ textAlign: 'center' }}>
+                                {awayTeamScorers.map((scorer: string) => {
+                                    if(scorer.replace(/[^\p{L}\d .']/gu, '') != 'null') {
+                                        return <Typography sx={{ fontSize: '0.75rem'}}><i>{scorer.replace(/[^\p{L}\d .']/gu, '')}</i></Typography>
+                                    }
+                                })}
+                            </Grid>
                         </Grid>
                         <Divider sx={{ paddingBottom: 2 }} />
                         <Grid container spacing={2}>
