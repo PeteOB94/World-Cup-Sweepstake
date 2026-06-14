@@ -5,7 +5,8 @@ import type { Team } from "../classes/Team";
 import Grid from "@mui/material/Grid";
 import GameCard from "../components/GameCard";
 import { getAssignedTeamName } from "../utils/getAssignedTeamName";
-import { Chip, Stack } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Chip, Stack, Typography } from "@mui/material";
+import ExpandMoreOutlined from '@mui/icons-material/ExpandMoreOutlined';
 import { getPeopleList } from "../utils/getPeopleList";
 import { getTeamsByPerson } from "../utils/getTeamsByPerson";
 
@@ -13,7 +14,12 @@ function MatchesPage({ matches, teams, stadiums, groups, rounds }: { matches: Ga
     const [filterOnGroup, setFilterOnGroup] = useState<string>('');
     const [filterOnPersonName, setFilterOnPersonName] = useState<string>('');
     const [filteredMatches, setFilteredMatches] = useState<Game[]>(matches);
+    const [selectedChip, setSelectedChip] = useState<string>('');
+    const [selectedChipGroup, setSelectedChipGroup] = useState<boolean>(false);
     const people: string[] = getPeopleList();
+
+    const colours = ["#bf2932", "#589043", "#23658e"];
+    let colourIndex = 0
 
     useEffect(() => {
         if (filterOnGroup) {
@@ -50,23 +56,63 @@ function MatchesPage({ matches, teams, stadiums, groups, rounds }: { matches: Ga
 
     function clickGroupChip(groupName: string) {
         setFilterOnGroup(groupName);
+        setSelectedChip(groupName);
+        setSelectedChipGroup(true);
     }
 
     function clickPeopleChip(personName: string) {
         setFilterOnPersonName(personName);
+        setSelectedChip(personName);
+        setSelectedChipGroup(false);
+    }
+
+    function deleteFilter() {
+        setFilteredMatches(matches);
+        setSelectedChip('');
+        setSelectedChipGroup(false);
     }
 
     return (
         <Stack sx={{ padding: 2 }}>
-            <Grid container spacing={1} sx={{ justifyContent: 'center', alignItems: 'center ' }}>
-                <Chip label="All Matches" onClick={() => clickGroupChip('')} />
-                {groups.map((groupName: string) => {
-                    return <Chip label={`Group ${groupName}`} onClick={() => clickGroupChip(groupName)} />
-                })}
-                {people.map((personName: string) => {
-                    return <Chip label={personName} onClick={() => clickPeopleChip(personName)} />
-                })}
-            </Grid>
+            <Stack spacing={2}>
+                <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+                        <Typography component="span">Groups</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Grid container spacing={1} sx={{ justifyContent: 'center', alignItems: 'center ' }}>
+                            {groups.map((groupName: string) => {
+                                colourIndex++;
+                                return <Chip
+                                    clickable={true}
+                                    label={`Group ${groupName}`}
+                                    onClick={() => clickGroupChip(groupName)}
+                                    sx={{ border: `1px solid ${colours[colourIndex % 3]}`}}
+                                />
+                            })}
+                        </Grid>
+                    </AccordionDetails>
+                </Accordion>
+                <Accordion>
+                    <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+                        <Typography component="span">People</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        <Grid container spacing={1} sx={{ justifyContent: 'center', alignItems: 'center ' }}>
+                            {people.map((personName: string) => {
+                                colourIndex++;
+                                return <Chip
+                                    clickable={true}
+                                    label={personName}
+                                    onClick={() => clickPeopleChip(personName)}
+                                    sx={{ border: `1px solid ${colours[colourIndex % 3]}`}}
+                                />
+                            })}
+                        </Grid>
+                    </AccordionDetails>
+                </Accordion>
+                {selectedChip && (<Chip label={selectedChipGroup ? `Group ${selectedChip}` : `${selectedChip}`} onDelete={deleteFilter}/>)}
+            </Stack>
             <Grid container spacing={2} sx={{ paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 2 }}>
                 {filteredMatches.map((match: Game) => {
                     const homeTeam = teams.find((team) => team.id == match.home_team_id);

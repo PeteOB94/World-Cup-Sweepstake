@@ -154,7 +154,7 @@ function App() {
   }, [games])
 
   return (
-    <Stack>
+    <Stack sx={{ height: 1}}>
       {value == 0 && <HomePage currentGame={currentGame} nextGame={nextGame} teams={teams} stadiums={stadiums} />}
       {value == 1 && <GroupsPage groups={groups} teams={teams} />}
       {value == 2 && <MatchesPage matches={games} teams={teams} stadiums={stadiums} groups={groupNames} rounds={rounds} />}
