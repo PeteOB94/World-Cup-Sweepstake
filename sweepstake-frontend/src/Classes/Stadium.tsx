@@ -8,6 +8,6 @@ export class Stadium {
     city_fa!: string;
     country_en!: string;
     country_fa!: string;
-    capacity!: string;
+    capacity!: number;
     region!: string;
 }

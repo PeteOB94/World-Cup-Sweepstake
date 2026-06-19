@@ -15,14 +15,15 @@ import MatchesPage from './pages/MatchesPage';
 import { ZoneTimes } from './assets/ZoneTimes';
 import axiosRetry from 'axios-retry';
 import teamsJson from './assets/teams.json';
+import stadiumsJson from './assets/stadiums.json';
 import { sortGroup } from './utils/sortGroup';
 
 function App() {
   const allTeams: Team[] = teamsJson;
+  const allStadiums: Stadium[] = stadiumsJson; 
   const [games, setGames] = useState<Game[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [teamList] = useState<Team[]>(allTeams);
-  const [stadiums, setStadiums] = useState<Stadium[]>([]);
   const [nextGame, setNextGame] = useState<Game>();
   const [currentGame, setCurrentGame] = useState<Game>();
   const [value, setValue] = useState(0);
@@ -60,22 +61,12 @@ function App() {
   });
 
   useEffect(() => {
-    async function getStadiumData() {
-      await axios.get('https://worldcup26.ir/get/stadiums').then((response) => setStadiums(response.data.stadiums));
-    }
-
-    if (!(stadiums.length > 0)) {
-      getStadiumData();
-    }
-  });
-
-  useEffect(() => {
     async function getGameData() {
       await axios.get('https://worldcup26.ir/get/games').then((response) => {
         response.data.games.forEach((game: Game) => {
           rounds.push(game.type);
           const gameTime = Date.parse(game.local_date);
-          const stadium = stadiums.find((stadium) => stadium.id == game.stadium_id);
+          const stadium = allStadiums.find((stadium) => stadium.id == game.stadium_id);
           let difference = 0;
           if (stadium) {
             difference = ZoneTimes[stadium.id];
@@ -95,7 +86,7 @@ function App() {
     if (!(games.length > 0)) {
       getGameData();
     }
-  }, [stadiums]);
+  });
 
   useEffect(() => {
     if (games && nextGame) {
@@ -114,13 +105,13 @@ function App() {
       })
       setNextGame(closestGame);
     }
-  }, [games])
+  }, [games, nextGame])
 
   return (
     <Stack sx={{ height: 1}}>
-      {value == 0 && <HomePage currentGame={currentGame} nextGame={nextGame} teams={teamList} stadiums={stadiums} />}
+      {value == 0 && <HomePage currentGame={currentGame} nextGame={nextGame} teams={teamList} stadiums={allStadiums} />}
       {value == 1 && <GroupsPage groups={groups} teams={teamList} />}
-      {value == 2 && <MatchesPage matches={games} teams={teamList} stadiums={stadiums} groups={groupNames} rounds={rounds} />}
+      {value == 2 && <MatchesPage matches={games} teams={teamList} stadiums={allStadiums} groups={groupNames} rounds={rounds} />}
       <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
         <Box sx={{ width: 1 }}>
           <BottomNavigation
