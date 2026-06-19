@@ -14,11 +14,14 @@ import HomePage from './pages/HomePage';
 import MatchesPage from './pages/MatchesPage';
 import { ZoneTimes } from './assets/ZoneTimes';
 import axiosRetry from 'axios-retry';
+import teamsJson from './assets/teams.json';
+import { sortGroup } from './utils/sortGroup';
 
 function App() {
+  const allTeams: Team[] = teamsJson;
   const [games, setGames] = useState<Game[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
+  const [teamList] = useState<Team[]>(allTeams);
   const [stadiums, setStadiums] = useState<Stadium[]>([]);
   const [nextGame, setNextGame] = useState<Game>();
   const [currentGame, setCurrentGame] = useState<Game>();
@@ -44,37 +47,7 @@ function App() {
           const currentGroupNames = groupNames;
           currentGroupNames.push(group.name);
           setGroupNames(currentGroupNames);
-          group.teams.sort((a: GroupTeam, b: GroupTeam) => {
-            const aPts = parseInt(a.pts);
-            const bPts = parseInt(b.pts);
-            if (aPts > bPts) {
-              return -1;
-            }
-            if (aPts < bPts) {
-              return 1;
-            }
-            if (aPts == bPts) {
-              const aGd = parseInt(a.gd);
-              const bGd = parseInt(b.gd);
-              if (aGd > bGd) {
-                return -1
-              }
-              if (aGd < bGd) {
-                return 1;
-              }
-              if (aGd == bGd) {
-                const aGf = parseInt(a.gf);
-                const bGf = parseInt(b.gf);
-                if (aGf > bGf) {
-                  return -1;
-                }
-                if (aGf < bGf) {
-                  return 1;
-                }
-              }
-            }
-            return 0;
-          });
+          group = sortGroup(group);
           group.teams.forEach((team: GroupTeam) => team.id = team._id);
         });
         setGroups(sortedGroups);
@@ -84,17 +57,7 @@ function App() {
     if (!(groups.length > 0)) {
       getGroupsData();
     }
-  }, []);
-
-  useEffect(() => {
-    async function getTeamsData() {
-      await axios.get('https://worldcup26.ir/get/teams').then((response) => setTeams(response.data.teams));
-    }
-
-    if (!(teams.length > 0)) {
-      getTeamsData();
-    }
-  }, []);
+  });
 
   useEffect(() => {
     async function getStadiumData() {
@@ -104,7 +67,7 @@ function App() {
     if (!(stadiums.length > 0)) {
       getStadiumData();
     }
-  }, []);
+  });
 
   useEffect(() => {
     async function getGameData() {
@@ -119,7 +82,7 @@ function App() {
           }
           const gameTimeLocal = gameTime + (difference * 60 * 60 * 1000);
           game.date = gameTimeLocal;
-          if (game.time_elapsed != "notstarted" && game.time_elapsed != "finished") {
+          if (game.time_elapsed.toUpperCase() != "NOTSTARTED" && game.time_elapsed.toUpperCase() != "FINISHED") {
             setCurrentGame(game);
           }
         })
@@ -155,9 +118,9 @@ function App() {
 
   return (
     <Stack sx={{ height: 1}}>
-      {value == 0 && <HomePage currentGame={currentGame} nextGame={nextGame} teams={teams} stadiums={stadiums} />}
-      {value == 1 && <GroupsPage groups={groups} teams={teams} />}
-      {value == 2 && <MatchesPage matches={games} teams={teams} stadiums={stadiums} groups={groupNames} rounds={rounds} />}
+      {value == 0 && <HomePage currentGame={currentGame} nextGame={nextGame} teams={teamList} stadiums={stadiums} />}
+      {value == 1 && <GroupsPage groups={groups} teams={teamList} />}
+      {value == 2 && <MatchesPage matches={games} teams={teamList} stadiums={stadiums} groups={groupNames} rounds={rounds} />}
       <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
         <Box sx={{ width: 1 }}>
           <BottomNavigation

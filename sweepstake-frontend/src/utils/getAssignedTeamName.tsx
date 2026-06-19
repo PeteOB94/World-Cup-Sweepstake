@@ -1,8 +1,8 @@
-import assignedTeams from '../assets/assigned_teams.json';
+import AssignedTeams from '../assets/AssignedTeams';
 
 export const getAssignedTeamName = (fifaCode?: string): string => {
     if (!fifaCode) {
         return '';
     }
-    return assignedTeams[fifaCode as keyof typeof assignedTeams] ?? '';
+    return AssignedTeams.get(fifaCode) ?? '';
 }

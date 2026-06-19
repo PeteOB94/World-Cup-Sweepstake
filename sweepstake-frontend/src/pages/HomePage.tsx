@@ -39,52 +39,50 @@ function HomePage({ nextGame, currentGame, teams, stadiums }: { nextGame: Game |
                     </Typography>
                 </Grid>
             </Grid>
-            <Grid container spacing={2} sx={{ width: '100%', paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 2 }}>
-                <Grid size={{ xs: 0, sm: 0, md: 2}}></Grid>
-                {(nextGame || currentGame) && teams ? (
-                <>
-                    {currentGame && teams && 
-                        <Grid size={{ xs: 12, sm: 12, md: 4 }}>
-                            <Box sx={{ width: '100%', paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 2 }}>
-                                <Typography variant="h5" gutterBottom>Current Game</Typography>
-                                <GameCard 
-                                    game={currentGame} 
-                                    homeTeamName={currentHomeTeam?.name_en ?? ''}
-                                    homeTeamFlag={currentHomeTeam?.flag ?? ''}
-                                    homeTeamAssignee={currentAssignedTeamNameHome}
-                                    awayTeamFlag={currentAwayTeam?.flag ?? ''}
-                                    awayTeamAssignee={currentAssignedTeamNameAway}
-                                    stadiumName={stadiums.find((stadium) => stadium.id == currentGame.stadium_id)?.name_en ?? ''} 
-                                    awayTeamName={currentAwayTeam?.name_en ?? ''}
-                                    homeTeamScorers={currentGame.home_scorers.split(',')}
-                                    awayTeamScorers={currentGame.away_scorers.split(',')}
-                                />
-                            </Box>
-                        </Grid>
-                    }
-                    {nextGame && teams &&
-                        <Grid size={{ xs: 12, sm: 12, md: 4 }}>
-                            <Box sx={{ width: '100%', paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 2 }}>
-                                <Typography variant="h5" gutterBottom>Next Game</Typography>
-                                <GameCard 
-                                    game={nextGame} 
-                                    homeTeamName={nextHomeTeam?.name_en ?? ''} 
-                                    homeTeamFlag={nextHomeTeam?.flag ?? ''}
-                                    homeTeamAssignee={nextAssignedTeamNameHome}
-                                    awayTeamFlag={nextAwayTeam?.flag ?? ''}
-                                    awayTeamAssignee={nextAssignedTeamNameAway}
-                                    stadiumName={stadiums.find((stadium) => stadium.id == nextGame.stadium_id)?.name_en ?? ''} 
-                                    awayTeamName={nextAwayTeam?.name_en ?? ''}
-                                    homeTeamScorers={nextGame.home_scorers.split(',')}
-                                    awayTeamScorers={nextGame.away_scorers.split(',')}
-                                />
-                            </Box>
-                        </Grid>
-                    }
-                </>
-                ) : (<CircularProgress aria-label="Loading…" />)}
-                <Grid size={{ xs: 0, sm: 0, md: 2}}></Grid>
-            </Grid>
+            {(nextGame || currentGame) && teams ? (
+                <Grid container spacing={2} sx={{ width: '100%', paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 2 }}>
+                    <Grid size={{ xs: 0, sm: 0, md: 2}}></Grid>
+                        {currentGame && teams && 
+                            <Grid size={{ xs: 12, sm: 12, md: 4 }}>
+                                <Box sx={{ width: '100%', paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 2 }}>
+                                    <Typography variant="h5" gutterBottom>Current Game</Typography>
+                                    <GameCard 
+                                        game={currentGame} 
+                                        homeTeamName={currentHomeTeam?.name_en ?? ''}
+                                        homeTeamFlag={currentHomeTeam?.flag ?? ''}
+                                        homeTeamAssignee={currentAssignedTeamNameHome}
+                                        awayTeamFlag={currentAwayTeam?.flag ?? ''}
+                                        awayTeamAssignee={currentAssignedTeamNameAway}
+                                        stadiumName={stadiums.find((stadium) => stadium.id == currentGame.stadium_id)?.name_en ?? ''} 
+                                        awayTeamName={currentAwayTeam?.name_en ?? ''}
+                                        homeTeamScorers={currentGame.home_scorers.split(',')}
+                                        awayTeamScorers={currentGame.away_scorers.split(',')}
+                                    />
+                                </Box>
+                            </Grid>
+                        }
+                        {nextGame && teams &&
+                            <Grid size={{ xs: 12, sm: 12, md: 4 }}>
+                                <Box sx={{ width: '100%', paddingBottom: 2, paddingTop: 2, paddingLeft: 2, paddingRight: 2 }}>
+                                    <Typography variant="h5" gutterBottom>Next Game</Typography>
+                                    <GameCard 
+                                        game={nextGame} 
+                                        homeTeamName={nextHomeTeam?.name_en ?? ''} 
+                                        homeTeamFlag={nextHomeTeam?.flag ?? ''}
+                                        homeTeamAssignee={nextAssignedTeamNameHome}
+                                        awayTeamFlag={nextAwayTeam?.flag ?? ''}
+                                        awayTeamAssignee={nextAssignedTeamNameAway}
+                                        stadiumName={stadiums.find((stadium) => stadium.id == nextGame.stadium_id)?.name_en ?? ''} 
+                                        awayTeamName={nextAwayTeam?.name_en ?? ''}
+                                        homeTeamScorers={nextGame.home_scorers.split(',')}
+                                        awayTeamScorers={nextGame.away_scorers.split(',')}
+                                    />
+                                </Box>
+                            </Grid>
+                        }
+                    <Grid size={{ xs: 0, sm: 0, md: 2}}></Grid>
+                </Grid>
+            ) : (<CircularProgress aria-label="Loading…" />)}
         </Stack>
     )
 }

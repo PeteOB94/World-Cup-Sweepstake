@@ -1,8 +1,8 @@
-import assignedTeams from '../assets/assigned_teams.json';
+import AssignedTeams from '../assets/AssignedTeams';
 
 export const getTeamsByPerson = (person: string): string[] => {
-    const keysList = Object.keys(assignedTeams);
+    const keysList = Object.keys(AssignedTeams);
     const teams: string[] = [];
-    keysList.forEach((key: string) => assignedTeams[key] == person ? teams.push(key) : '');
+    keysList.forEach((key: string) => AssignedTeams.get(key) == person ? teams.push(key) : '');
     return teams;
 }
