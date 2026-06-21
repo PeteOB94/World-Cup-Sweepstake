@@ -62,13 +62,13 @@ function GameCard({
                             <Grid size={4} sx={{ textAlign: 'center' }}>
                                 <Grid container spacing={2}>
                                     <Grid size={4} sx={{ textAlign: 'center' }}>
-                                        <Typography sx={{ fontSize: '2rem', fontWeight: 'bold', background: 'linear-gradient(45deg, #bf2932 30%, #23658e 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} noWrap={true}>{game.home_score}</Typography>
+                                        <Typography sx={{ fontSize: '2rem', fontWeight: 'bold', background: 'linear-gradient(45deg, #bf2932 30%, #23658e 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} noWrap={true}>{game.home_score == 'null' ? 0 : game.home_score}</Typography>
                                     </Grid>
                                     <Grid size={4} sx={{ textAlign: 'center', display: 'inline', alignContent: 'center' }}>
                                         <Typography variant="body2" sx={{ textAlign: 'center' }}>-</Typography>
                                     </Grid>
                                     <Grid size={4} sx={{ textAlign: 'center' }}>
-                                        <Typography sx={{ fontSize: '2rem', fontWeight: 'bold', background: 'linear-gradient(45deg, #bf2932 30%, #23658e 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} noWrap={true}>{game.away_score}</Typography>
+                                        <Typography sx={{ fontSize: '2rem', fontWeight: 'bold', background: 'linear-gradient(45deg, #bf2932 30%, #23658e 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} noWrap={true}>{game.away_score == 'null' ? 0 : game.away_score}</Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
