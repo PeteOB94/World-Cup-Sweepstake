@@ -79,7 +79,7 @@ function GameCard({
                             <Grid size={5} sx={{ textAlign: 'center' }}>
                                 {homeTeamScorers.map((scorer: string) => {
                                     if(scorer.replace(/[^\p{L}\d .']/gu, '') != 'null') {
-                                        return <Typography sx={{ fontSize: '0.75rem'}}><i>{scorer.replace(/[^\p{L}\d .']/gu, '')}</i></Typography>
+                                        return <Typography sx={{ fontSize: '0.75rem'}}><i>{scorer.replace(/[^\p{L}\d .'+]/gu, '')}</i></Typography>
                                     }
                                 })}
                             </Grid>
@@ -89,7 +89,7 @@ function GameCard({
                             <Grid size={5} sx={{ textAlign: 'center' }}>
                                 {awayTeamScorers.map((scorer: string) => {
                                     if(scorer.replace(/[^\p{L}\d .']/gu, '') != 'null') {
-                                        return <Typography sx={{ fontSize: '0.75rem'}}><i>{scorer.replace(/[^\p{L}\d .']/gu, '')}</i></Typography>
+                                        return <Typography sx={{ fontSize: '0.75rem'}}><i>{scorer.replace(/[^\p{L}\d .'+]/gu, '')}</i></Typography>
                                     }
                                 })}
                             </Grid>
