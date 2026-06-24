@@ -8,7 +8,8 @@ import { BottomNavigation, BottomNavigationAction, Box, Paper, Stack } from '@mu
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import SportsOutlinedIcon from '@mui/icons-material/SportsOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import type { GroupTeam } from './classes/GroupTeam';
+import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
+import { GroupTeam } from './classes/GroupTeam';
 import GroupsPage from './pages/GroupsPage';
 import HomePage from './pages/HomePage';
 import MatchesPage from './pages/MatchesPage';
@@ -17,6 +18,7 @@ import axiosRetry from 'axios-retry';
 import teamsJson from './assets/teams.json';
 import stadiumsJson from './assets/stadiums.json';
 import { sortGroup } from './utils/sortGroup';
+import WinnersPage from './pages/WinnersPage';
 
 function App() {
   const allTeams: Team[] = teamsJson;
@@ -28,6 +30,7 @@ function App() {
   const [currentGames, setCurrentGames] = useState<Game[]>([]);
   const [value, setValue] = useState(0);
   const [groupNames, setGroupNames] = useState<string[]>([]);
+  const [allGroupTeams, setAllGroupTeams] = useState<GroupTeam[]>([]);
   const rounds: string[] = [];
 
   axiosRetry(axios, {
@@ -49,7 +52,11 @@ function App() {
           currentGroupNames.push(group.name);
           setGroupNames(currentGroupNames);
           group = sortGroup(group);
-          group.teams.forEach((team: GroupTeam) => team.id = team._id);
+          group.teams.forEach((team: GroupTeam) => {
+            team.id = team._id
+            allGroupTeams.push(team);
+            setAllGroupTeams(allGroupTeams);
+          });
         });
         setGroups(sortedGroups);
       })
@@ -119,6 +126,7 @@ function App() {
       {value == 0 && <HomePage currentGames={currentGames} nextGames={nextGames} teams={teamList} stadiums={allStadiums} />}
       {value == 1 && <GroupsPage groups={groups} teams={teamList} />}
       {value == 2 && <MatchesPage matches={games} teams={teamList} stadiums={allStadiums} groups={groupNames} rounds={rounds} />}
+      {value == 3 && <WinnersPage />}
       <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
         <Box sx={{ width: 1 }}>
           <BottomNavigation
@@ -131,6 +139,7 @@ function App() {
             <BottomNavigationAction label="Home" icon={<HomeOutlinedIcon />} />
             <BottomNavigationAction label="Groups" icon={<GroupsOutlinedIcon />} />
             <BottomNavigationAction label="Matches" icon={<SportsOutlinedIcon />} />
+            <BottomNavigationAction label="Winners" icon={<EmojiEventsOutlinedIcon />} /> 
           </BottomNavigation>
         </Box>
       </Paper>

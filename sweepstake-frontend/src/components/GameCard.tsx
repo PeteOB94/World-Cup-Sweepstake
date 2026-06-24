@@ -24,13 +24,15 @@ function GameCard({
         awayTeamScorers: string[];
      }) {
 
+    const cardTitle = game.type == 'group' ? `Group ${game.group}` : (game.type == 'r32' || game.type == 'r16' ? `RO${game.group.substring(1)}` : `${game.group.toUpperCase()}`);
+
     return (
         <Box>
             <Card variant="outlined" sx={{ borderRadius: 2, boxShadow: 3 }}>
                 <CardContent>
                     <Stack spacing={1}>
                         <Grid container spacing={2} sx={{ paddingBottom: 4 }}>
-                            <Grid size={6} sx={{ textAlign: 'center' }}><Chip label={`Group ${game.group}`} /></Grid>
+                            <Grid size={6} sx={{ textAlign: 'center' }}><Chip label={cardTitle} /></Grid>
                             <Grid size={6} sx={{ textAlign: 'center' }}>Matchday {game.matchday}</Grid>
                         </Grid>
                         <Grid container spacing={2}>
