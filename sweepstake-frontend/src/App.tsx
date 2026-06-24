@@ -20,12 +20,12 @@ import { sortGroup } from './utils/sortGroup';
 
 function App() {
   const allTeams: Team[] = teamsJson;
-  const allStadiums: Stadium[] = stadiumsJson; 
+  const allStadiums: Stadium[] = stadiumsJson;
   const [games, setGames] = useState<Game[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [teamList] = useState<Team[]>(allTeams);
-  const [nextGame, setNextGame] = useState<Game>();
-  const [currentGame, setCurrentGame] = useState<Game>();
+  const [nextGames, setNextGames] = useState<Game[]>([]);
+  const [currentGames, setCurrentGames] = useState<Game[]>([]);
   const [value, setValue] = useState(0);
   const [groupNames, setGroupNames] = useState<string[]>([]);
   const rounds: string[] = [];
@@ -33,12 +33,12 @@ function App() {
   axiosRetry(axios, {
     retries: 5,
     retryDelay: (retryCount) => {
-        return retryCount * 2000;
+      return retryCount * 2000;
     },
     retryCondition: (error) => {
-        return error ? true : false;
+      return error ? true : false;
     },
-});
+  });
 
   useEffect(() => {
     async function getGroupsData() {
@@ -62,6 +62,8 @@ function App() {
 
   useEffect(() => {
     async function getGameData() {
+      setCurrentGames([]);
+      setNextGames([]);
       await axios.get('https://worldcup26.ir/get/games').then((response) => {
         response.data.games.forEach((game: Game) => {
           rounds.push(game.type);
@@ -74,11 +76,11 @@ function App() {
           const gameTimeLocal = gameTime + (difference * 60 * 60 * 1000);
           game.date = gameTimeLocal;
           if (game.time_elapsed.toUpperCase() != "NOTSTARTED" && game.time_elapsed.toUpperCase() != "FINISHED") {
-            setCurrentGame(game);
+            currentGames.push(game);
+            setCurrentGames(currentGames);
           }
         })
         response.data.games.sort((a: Game, b: Game) => (a.date && b.date) ? ((a.date > b.date) ? 1 : (a.date < b.date) ? -1 : 0) : 0);
-        setNextGame(response.data.games[0])
         setGames(response.data.games);
       });
     }
@@ -86,30 +88,35 @@ function App() {
     if (!(games.length > 0)) {
       getGameData();
     }
-  });
+  }, []);
 
   useEffect(() => {
-    if (games && nextGame) {
-      let closestGame = nextGame;
+    if (games) {
+      let closestGame = games[0];
       games.forEach((game: Game) => {
+        if (nextGames.length > 0) {
+          closestGame = nextGames[0];
+        }
         const currentDate = new Date();
         const now = Date.parse(currentDate.toISOString());
         if (game.date && now < game.date) {
           if (closestGame && closestGame.date && closestGame.date < now) {
-            closestGame = game;
+            nextGames[0] = game;
           }
-          if (closestGame && closestGame.date && closestGame.date > game.date) {
-            closestGame = game;
+          if (closestGame && closestGame.date && closestGame.date >= game.date) {
+            if (!nextGames.includes(game)) {
+              nextGames.push(game);
+            }
           }
+          setNextGames(nextGames);
         }
       })
-      setNextGame(closestGame);
     }
-  }, [games, nextGame])
+  }, [games, nextGames])
 
   return (
-    <Stack sx={{ height: 1}}>
-      {value == 0 && <HomePage currentGame={currentGame} nextGame={nextGame} teams={teamList} stadiums={allStadiums} />}
+    <Stack sx={{ height: 1 }}>
+      {value == 0 && <HomePage currentGames={currentGames} nextGames={nextGames} teams={teamList} stadiums={allStadiums} />}
       {value == 1 && <GroupsPage groups={groups} teams={teamList} />}
       {value == 2 && <MatchesPage matches={games} teams={teamList} stadiums={allStadiums} groups={groupNames} rounds={rounds} />}
       <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>

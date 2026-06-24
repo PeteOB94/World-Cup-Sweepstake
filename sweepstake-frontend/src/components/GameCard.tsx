@@ -58,21 +58,21 @@ function GameCard({
                             </Grid>
                         </Grid>
                         <Grid container spacing={2}>
-                            <Grid size={4}></Grid>
-                            <Grid size={4} sx={{ textAlign: 'center' }}>
+                            <Grid size={2}></Grid>
+                            <Grid size={8} sx={{ textAlign: 'center' }}>
                                 <Grid container spacing={2}>
-                                    <Grid size={4} sx={{ textAlign: 'center' }}>
+                                    <Grid size={{ xs: 5, sm: 5, md: 2 }} sx={{ textAlign: 'center' }}>
                                         <Typography sx={{ fontSize: '2rem', fontWeight: 'bold', background: 'linear-gradient(45deg, #bf2932 30%, #23658e 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} noWrap={true}>{game.home_score == 'null' ? 0 : game.home_score}</Typography>
                                     </Grid>
-                                    <Grid size={4} sx={{ textAlign: 'center', display: 'inline', alignContent: 'center' }}>
+                                    <Grid size={{ xs: 2, sm: 2, md: 8 }} sx={{ textAlign: 'center', display: 'inline', alignContent: 'center' }}>
                                         <Typography variant="body2" sx={{ textAlign: 'center' }}>-</Typography>
                                     </Grid>
-                                    <Grid size={4} sx={{ textAlign: 'center' }}>
+                                    <Grid size={{ xs: 5, sm: 5, md: 2 }} sx={{ textAlign: 'center' }}>
                                         <Typography sx={{ fontSize: '2rem', fontWeight: 'bold', background: 'linear-gradient(45deg, #bf2932 30%, #23658e 90%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }} noWrap={true}>{game.away_score == 'null' ? 0 : game.away_score}</Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            <Grid size={4}></Grid>
+                            <Grid size={2}></Grid>
                         </Grid>
                         <Divider sx={{ paddingBottom: 2 }} />
                         <Grid container spacing={2}>
