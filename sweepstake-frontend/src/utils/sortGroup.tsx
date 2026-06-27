@@ -2,7 +2,8 @@ import { Group } from '../classes/Group'
 import type { GroupTeam } from '../classes/GroupTeam';
 
 export const sortGroup = (group: Group) => {
-    group.teams.sort((a: GroupTeam, b: GroupTeam) => {
+    const teamsCopy = group.teams.slice();
+    teamsCopy.sort((a: GroupTeam, b: GroupTeam) => {
         const aPts = parseInt(a.pts);
         const bPts = parseInt(b.pts);
         if (aPts > bPts) {
@@ -33,5 +34,6 @@ export const sortGroup = (group: Group) => {
         }
         return 0;
     });
+    group.teams = teamsCopy;
     return group;
 }

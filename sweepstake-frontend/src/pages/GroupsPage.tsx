@@ -18,6 +18,13 @@ function GroupsPage({ groups, teams }: { groups: Group[]; teams: Team[] }) {
                 slots={{
                   toolbar: () => DataGridTitle("Group " + group.name, count++)
                 }}
+                autosizeOnMount
+                autosizeOptions={{
+                    includeOutliers: true,
+                    includeHeaders: true,
+                    outliersFactor: 10,
+                    expand: true
+                }}
                 showToolbar
                 label={group.name}
                 rows={group.teams}

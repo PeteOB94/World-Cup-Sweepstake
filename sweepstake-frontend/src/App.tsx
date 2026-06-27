@@ -19,6 +19,7 @@ import teamsJson from './assets/teams.json';
 import stadiumsJson from './assets/stadiums.json';
 import { sortGroup } from './utils/sortGroup';
 import WinnersPage from './pages/WinnersPage';
+import type { Scorer } from './classes/Scorer';
 
 function App() {
   const allTeams: Team[] = teamsJson;
@@ -30,7 +31,8 @@ function App() {
   const [currentGames, setCurrentGames] = useState<Game[]>([]);
   const [value, setValue] = useState(0);
   const [groupNames, setGroupNames] = useState<string[]>([]);
-  const [allGroupTeams, setAllGroupTeams] = useState<GroupTeam[]>([]);
+  const [allGroupTeams, setAllGroupTeams] = useState<Group>(new Group());
+  const [allScorers, setAllScorers] = useState<Scorer[]>([]);
   const rounds: string[] = [];
 
   axiosRetry(axios, {
@@ -46,6 +48,11 @@ function App() {
   useEffect(() => {
     async function getGroupsData() {
       await axios.get('https://worldcup26.ir/get/groups').then((response) => {
+        const allTeamsGroup = new Group();
+        allTeamsGroup._id = 'all_teams_group';
+        allTeamsGroup.createdAt = '';
+        allTeamsGroup.name = 'All Teams';
+        allTeamsGroup.teams = [];
         const sortedGroups = response.data.groups.sort((a: Group, b: Group) => (a.name && b.name) ? ((a.name > b.name) ? 1 : (a.name < b.name) ? -1 : 0) : 0);
         sortedGroups.forEach((group: Group) => {
           const currentGroupNames = groupNames;
@@ -54,10 +61,10 @@ function App() {
           group = sortGroup(group);
           group.teams.forEach((team: GroupTeam) => {
             team.id = team._id
-            allGroupTeams.push(team);
-            setAllGroupTeams(allGroupTeams);
+            allTeamsGroup.teams.push(team);
           });
         });
+        setAllGroupTeams(allTeamsGroup);
         setGroups(sortedGroups);
       })
     }
@@ -72,6 +79,7 @@ function App() {
       setCurrentGames([]);
       setNextGames([]);
       await axios.get('https://worldcup26.ir/get/games').then((response) => {
+        setAllScorers([]);
         response.data.games.forEach((game: Game) => {
           rounds.push(game.type);
           const gameTime = Date.parse(game.local_date);
@@ -86,6 +94,50 @@ function App() {
             currentGames.push(game);
             setCurrentGames(currentGames);
           }
+          if (game.home_scorers != 'null') {
+            const homeTeam = teamList.find((team) => team.id == game.home_team_id);
+            const homeScorers = game.home_scorers.split(',');
+            homeScorers.forEach((scorer: string) => {
+              const scorerName = scorer.replace(/[^\p{L}\d .]/gu, '').replace(/[0-9'+]/gu, '').replace(' p', '').trim();
+              if (homeTeam) {
+                const existingScorer = allScorers.find((currentScorer) => currentScorer.name == scorerName);
+                if (existingScorer) {
+                  existingScorer.goalCount = existingScorer.goalCount + 1;
+                }
+                else {
+                  allScorers.push({
+                    id: scorerName + '_id',
+                    name: scorerName,
+                    goalCount: 1,
+                    team: homeTeam
+                  })
+                }
+              }
+            })
+          }
+          if (game.away_scorers != 'null') {
+            const awayTeam = teamList.find((team) => team.id == game.away_team_id);
+            const awayScorers = game.away_scorers.split(',');
+            awayScorers.forEach((scorer: string) => {
+              const scorerName = scorer.replace(/[^\p{L}\d .]/gu, '').replace(/[0-9'+]/gu, '').replace(' p', '').trim();
+              if (awayTeam) {
+                const existingScorer = allScorers.find((currentScorer) => currentScorer.name == scorerName);
+                if (existingScorer) {
+                  existingScorer.goalCount = existingScorer.goalCount + 1;
+                }
+                else {
+                  allScorers.push({
+                    id: scorerName + '_id',
+                    name: scorerName,
+                    goalCount: 1,
+                    team: awayTeam
+                  })
+                }
+              }
+            })
+          }
+          allScorers.sort((a: Scorer, b: Scorer) => a.goalCount < b.goalCount ? 1 : -1);
+          setAllScorers(allScorers);
         })
         response.data.games.sort((a: Game, b: Game) => (a.date && b.date) ? ((a.date > b.date) ? 1 : (a.date < b.date) ? -1 : 0) : 0);
         setGames(response.data.games);
@@ -126,7 +178,7 @@ function App() {
       {value == 0 && <HomePage currentGames={currentGames} nextGames={nextGames} teams={teamList} stadiums={allStadiums} />}
       {value == 1 && <GroupsPage groups={groups} teams={teamList} />}
       {value == 2 && <MatchesPage matches={games} teams={teamList} stadiums={allStadiums} groups={groupNames} rounds={rounds} />}
-      {value == 3 && <WinnersPage />}
+      {value == 3 && <WinnersPage groups={allGroupTeams} teams={teamList} scorers={allScorers} />}
       <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
         <Box sx={{ width: 1 }}>
           <BottomNavigation
@@ -139,7 +191,7 @@ function App() {
             <BottomNavigationAction label="Home" icon={<HomeOutlinedIcon />} />
             <BottomNavigationAction label="Groups" icon={<GroupsOutlinedIcon />} />
             <BottomNavigationAction label="Matches" icon={<SportsOutlinedIcon />} />
-            <BottomNavigationAction label="Winners" icon={<EmojiEventsOutlinedIcon />} /> 
+            <BottomNavigationAction label="Winners" icon={<EmojiEventsOutlinedIcon />} />
           </BottomNavigation>
         </Box>
       </Paper>
